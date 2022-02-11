@@ -20,6 +20,7 @@ export {
   useMemo,
   useCallback,
   useImperativeHandle,
+  useReducer,
 } from 'preact/hooks';
 
 /**
