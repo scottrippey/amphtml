@@ -38,7 +38,10 @@ function getUnminifiedConfig() {
   const replacePlugin = getReplacePlugin();
   const unminifiedPlugins = [
     './build-system/babel-plugins/babel-plugin-jsx-style-object',
-    getImportResolverPlugin(),
+    getImportResolverPlugin({
+      'react': './src/preact/alias',
+      'react-dom': './src/preact/alias',
+    }),
     argv.coverage ? 'babel-plugin-istanbul' : null,
     replacePlugin,
     './build-system/babel-plugins/babel-plugin-transform-json-import',
