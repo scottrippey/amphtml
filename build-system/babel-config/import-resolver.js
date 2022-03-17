@@ -42,16 +42,31 @@ function readJsconfigPaths() {
 }
 
 /**
- * Import map configuration.
- * @param {Object} [extraAliases]
+ * Remap external modules that rely on React if building for Preact.
+ * @param {'preact' | 'react'} buildFor
  * @return {Object}
  */
-function getImportResolver(extraAliases = {}) {
+function moduleAliases(buildFor) {
+  if (buildFor === 'react') {
+    return {};
+  }
+  return {
+    'react': './src/react',
+    'react-dom': './src/react/dom',
+  };
+}
+
+/**
+ * Import map configuration.
+ * @param {'preact' | 'react'} buildFor
+ * @return {Object}
+ */
+function getImportResolver(buildFor = 'preact') {
   return {
     root: ['.'],
     alias: {
       ...readJsconfigPaths(),
-      ...extraAliases,
+      ...moduleAliases(buildFor),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
     stripExtensions: [],
@@ -66,24 +81,24 @@ function getImportResolver(extraAliases = {}) {
 /**
  * Produces an alias map with paths relative to the provided root.
  * @param {string} rootDir
+ * @param {'preact' | 'react'} buildFor
  * @return {!Object<string, string>}
  */
-function getRelativeAliasMap(rootDir) {
+function getRelativeAliasMap(rootDir, buildFor = 'preact') {
   return Object.fromEntries(
-    Object.entries(getImportResolver().alias).map(([alias, destPath]) => [
-      alias,
-      path.join(rootDir, destPath),
-    ])
+    Object.entries(getImportResolver(buildFor).alias).map(
+      ([alias, destPath]) => [alias, path.join(rootDir, destPath)]
+    )
   );
 }
 
 /**
  * Import resolver Babel plugin configuration.
- * @param {Object} [extraAliases]
+ * @param {'preact' | 'react'} buildFor
  * @return {!Array}
  */
-function getImportResolverPlugin(extraAliases) {
-  return ['module-resolver', getImportResolver(extraAliases)];
+function getImportResolverPlugin(buildFor = 'preact') {
+  return ['module-resolver', getImportResolver(buildFor)];
 }
 
 /**
